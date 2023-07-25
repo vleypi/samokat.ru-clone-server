@@ -16,6 +16,5 @@ model User {
 
     phone String @unique
     name String @unique
-    password String
 }
 

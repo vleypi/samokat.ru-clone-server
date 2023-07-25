@@ -2,7 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserDto } from './dto/create-user.dto';
 import { PrismaService } from 'src/prisma.service'
 import { Prisma } from '@prisma/client';
-import { hash } from 'argon2'
 
 @Injectable()
 export class UserService {
@@ -37,14 +36,11 @@ export class UserService {
             throw new BadRequestException('Phone already in use')
         }
 
-        const user = await this.byId(id)
-
         return this.prisma.user.update({
           where: {id},
           data: {
             name: dto.name,
             phone: dto.phone,
-            password: dto.password ? await hash(dto.password) : user.password
           }
         })
     }

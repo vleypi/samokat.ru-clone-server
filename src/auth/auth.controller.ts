@@ -1,34 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, HttpCode,Post, UsePipes, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+
+import { AuthDto } from './dto/create-auth.dto';
+import { RefreshTokenDto } from './dto/refresh-toke.dto';
+import { Auth } from './decorators/auth.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
+  @UsePipes(new ValidationPipe())
+  @HttpCode(200)
+  @Post('login')
+  async login(@Body() dto: AuthDto){
+    return this.authService.login(dto)
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+  @UsePipes(new ValidationPipe())
+  @HttpCode(200)
+  @Auth()
+  @Post('login/accesss-token')
+  async getNewToken(@Body() dto: RefreshTokenDto){
+    return this.authService.getNewTokens(dto.refreshToken)
   }
 }

@@ -8,5 +8,7 @@ OnModuleInit{
         await this.$connect()
     }
 
-  
+    async enableShutdownHooks(app: INestApplication){
+        await app.close()
+    }
 }

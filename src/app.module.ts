@@ -5,9 +5,10 @@ import { CategoryModule } from './category/category.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { PrismaService } from './prisma.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [CategoryModule, AuthModule, UserModule],
+  imports: [ConfigModule.forRoot(),CategoryModule, AuthModule, UserModule],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })

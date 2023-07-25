@@ -30,8 +30,8 @@ export class AuthService {
       else{
         const user = await this.prisma.user.create({
           data: {
-            phone: faker.phone.number('+7 (###) ###-##-##'),
-            name: faker.person.firstName()
+            phone: dto.phone /*faker.phone.number('+7 (###) ###-##-##')*/,
+            name: dto.name/*faker.person.firstName()*/
           }
         })
 
@@ -45,6 +45,7 @@ export class AuthService {
     }
 
     async getNewTokens(refreshToken: string){
+      
       const result = await this.jwt.verifyAsync(refreshToken)
       if(!result) throw new UnauthorizedException('Invalid resresh token')
 

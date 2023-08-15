@@ -24,7 +24,9 @@ export class UserService {
             throw new Error('User not found')
         }
 
-        return user
+        return {
+          user
+        }
     }
     
     async updateProfile(id: number, dto: UserDto){

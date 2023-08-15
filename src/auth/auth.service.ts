@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { AuthDto } from './dto/create-auth.dto';
-import {faker} from '@faker-js/faker'
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
+import {faker} from '@faker-js/faker'
 
 @Injectable()
 export class AuthService {
@@ -23,7 +23,7 @@ export class AuthService {
         const tokens = await this.issueTokens(user.id)
   
         return {
-          user: this.returnUserFields,
+          user: this.returnUserFields(user),
           ...tokens
         }
       }
@@ -31,7 +31,7 @@ export class AuthService {
         const user = await this.prisma.user.create({
           data: {
             phone: dto.phone /*faker.phone.number('+7 (###) ###-##-##')*/,
-            name: dto.name/*faker.person.firstName()*/
+            name: faker.person.firstName()
           }
         })
 

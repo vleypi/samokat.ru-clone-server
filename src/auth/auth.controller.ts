@@ -2,7 +2,7 @@ import { Body, Controller, HttpCode,Post, UsePipes, ValidationPipe } from '@nest
 import { AuthService } from './auth.service';
 
 import { AuthDto } from './dto/create-auth.dto';
-import { RefreshTokenDto } from './dto/refresh-toke.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { Auth } from './decorators/auth.decorator';
 
 @Controller('auth')
@@ -17,7 +17,7 @@ export class AuthController {
   }
 
   @UsePipes(new ValidationPipe())
-  @HttpCode(200)
+  @HttpCode(200)    
   @Auth()
   @Post('login/accesss-token')
   async getNewToken(@Body() dto: RefreshTokenDto){

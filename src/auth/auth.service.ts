@@ -10,8 +10,9 @@ export class AuthService {
     constructor(private prisma: PrismaService, private jwt: JwtService) {}
     
 
-    async login(dto: AuthDto){
-      
+    async login(dto: AuthDto,res){
+
+
       const oldUser = await this.prisma.user.findUnique({
         where: {
             phone: dto.phone
@@ -21,6 +22,9 @@ export class AuthService {
       if(oldUser){
         const user = await this.validateUser(dto)
         const tokens = await this.issueTokens(user.id)
+
+        await res.cookie('acc', tokens.accessToken, { expires: new Date(Date.now() + 3600000), httpOnly: true})
+        await res.cookie('ref', tokens.refreshToken, { expires: new Date(Date.now() + 3600000), httpOnly: true})
   
         return {
           user: this.returnUserFields(user),
@@ -37,6 +41,9 @@ export class AuthService {
 
         const tokens = await this.issueTokens(user.id)
 
+        await res.cookie('acc', tokens.accessToken, { expires: new Date(Date.now() + 3600000), httpOnly: true})
+        await res.cookie('ref', tokens.refreshToken, { expires: new Date(Date.now() + 3600000), httpOnly: true})
+
         return {
           user: this.returnUserFields(user),
           ...tokens
@@ -44,7 +51,7 @@ export class AuthService {
       }
     }
 
-    async getNewTokens(refreshToken: string){
+    async getNewTokens(refreshToken: string,res){
       
       const result = await this.jwt.verifyAsync(refreshToken)
       if(!result) throw new UnauthorizedException('Invalid resresh token')
@@ -56,6 +63,9 @@ export class AuthService {
       })
 
       const tokens = await this.issueTokens(user.id)
+
+      await res.cookie('acc', tokens.accessToken, { expires: new Date(Date.now() + 3600000), httpOnly: true})
+      await res.cookie('ref', tokens.refreshToken, { expires: new Date(Date.now() + 3600000), httpOnly: true})
 
         return {
             user: this.returnUserFields(user),

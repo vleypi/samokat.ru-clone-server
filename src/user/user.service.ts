@@ -1,31 +1,54 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { UserDto } from './dto/create-user.dto';
 import { PrismaService } from 'src/prisma.service'
 import { Prisma } from '@prisma/client';
+import * as jwt from 'jsonwebtoken';
+
 
 @Injectable()
 export class UserService {
 
     constructor(private prisma: PrismaService) {}
 
-    async byId(id: number, selecObject: Prisma.UserSelect = {}){
-        const user = await this.prisma.user.findUnique({where: {
-              id
-          },
-          select: {
-              id: true,
-              phone: true,
-              name: true,
-              ...selecObject
-          }
-        })
+    async byId(req, res, selecObject: Prisma.UserSelect = {}){
 
-        if(!user){
-            throw new Error('User not found')
+        try{
+            const {acc,ref} = req.cookies
+
+            if(!acc || !ref){
+              await res.cookie('acc', '')
+              await res.cookie('ref', '')
+              throw new NotFoundException('Не найден')
+            }
+
+            const id = jwt.verify(req.cookies.acc,process.env.JWT_SECRET)['id']
+            await jwt.verify(req.cookies.ref,process.env.JWT_SECRET)['id']
+
+            const user = await this.prisma.user.findUnique({where: {
+                  id
+              },
+              select: {
+                  id: true,
+                  phone: true,
+                  name: true,
+                  ...selecObject
+              }
+            })
+
+            if(!user){
+                throw new Error('User not found')
+            }
+
+            return {
+              user,
+              acc,
+              ref
+            }
         }
-
-        return {
-          user
+        catch(err){
+            await res.clearCookie('acc')
+            await res.clearCookie('ref')
+            throw new NotFoundException('Не найден')
         }
     }
     

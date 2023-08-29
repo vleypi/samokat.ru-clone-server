@@ -1,16 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, HttpCode, Req, Res } from '@nestjs/common';
+import { Request,  Response} from 'express';
 import { UserService } from './user.service';
-import { Auth } from 'src/auth/decorators/auth.decorator';
-import { CurrentUser } from 'src/auth/decorators/user.decorator';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get('profile')
-  @Auth()
-  async getProfile(@CurrentUser('id') id: number){
-    return this.userService.byId(id)
+  @Post('profile')
+  async getProfile( @Req() req: Request, @Res({ passthrough: true }) res: Response){
+    return this.userService.byId(req,res)
   }
 
   // @UsePipes(new ValidationPipe())
